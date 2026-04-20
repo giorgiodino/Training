@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training">
+<title>Plan Biomécanique</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --g1:#0A5C47;--g2:#0F6E56;--g3:#1D9E75;--gl:#E1F5EE;
+  --r1:#7A2E12;--rl:#FAECE7;
+  --b1:#0E4A8A;--bl:#E6F1FB;
+  --p1:#3D338F;--pl:#EEEDFE;
+  --a1:#6B3C08;--al:#FAEEDA;
+  --text:#1A1A18;--sec:#5F5E5A;--hint:#9A9890;
+  --border:#E2E0D8;--bg:#F7F6F2;--card:#FFFFFF;
+  --radius:14px;
+}
+html{height:100%;background:var(--bg);}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh;}
+
+/* ── RADIO TABS ENGINE ── */
+input[type=radio]{display:none;}
+
+/* ── STICKY HEADER ── */
+.app-bar{position:sticky;top:0;z-index:200;background:var(--g2);}
+.app-bar-inner{padding:14px 16px 10px;}
+.app-bar h1{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.app-bar p{font-size:12px;color:rgba(255,255,255,.7);margin-top:2px;}
+
+/* ── TAB BAR ── */
+.tab-bar{display:flex;background:var(--g1);padding:0 8px 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(0,0,0,.15);}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-label{flex-shrink:0;padding:10px 14px;font-size:13px;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;border-bottom:3px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;}
+
+/* Active tab states */
+#t-lun:checked ~ .app-bar .tab-bar label[for=t-lun],
+#t-mar:checked ~ .app-bar .tab-bar label[for=t-mar],
+#t-mer:checked ~ .app-bar .tab-bar label[for=t-mer],
+#t-jeu:checked ~ .app-bar .tab-bar label[for=t-jeu],
+#t-ven:checked ~ .app-bar .tab-bar label[for=t-ven],
+#t-reg:checked ~ .app-bar .tab-bar label[for=t-reg]{color:#fff;border-bottom:3px solid #fff;}
+
+/* ── PAGES ── */
+.page{display:none;padding:16px 16px 80px;}
+#t-lun:checked ~ .pages .p-lun,
+#t-mar:checked ~ .pages .p-mar,
+#t-mer:checked ~ .pages .p-mer,
+#t-jeu:checked ~ .pages .p-jeu,
+#t-ven:checked ~ .pages .p-ven,
+#t-reg:checked ~ .pages .p-reg{display:block;}
+
+/* ── DAY HEADER ── */
+.day-header{margin-bottom:16px;}
+.day-header h2{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.4px;}
+.day-header p{font-size:14px;color:var(--sec);margin-top:3px;}
+.banner{background:var(--gl);border-left:4px solid var(--g3);border-radius:10px;padding:11px 13px;margin-bottom:20px;font-size:13px;color:var(--g2);line-height:1.6;}
+
+/* ── EXERCISE CARD ── */
+.ex{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;}
+.ex-head{padding:14px 14px 10px;}
+.ex-name{font-size:15px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:8px;}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.02em;}
+.b-poly{background:var(--gl);color:var(--g2);}
+.b-iso{background:var(--bl);color:var(--b1);}
+.b-super{background:var(--al);color:var(--a1);}
+.b-circ{background:var(--pl);color:var(--p1);}
+
+/* ── STATS GRID ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 14px;border-top:1px solid var(--border);}
+.stat{background:var(--bg);border-radius:9px;padding:9px 6px;text-align:center;}
+.sl{font-size:10px;color:var(--hint);margin-bottom:3px;font-weight:500;}
+.sv{font-size:13px;font-weight:700;color:var(--text);}
+
+/* ── TEMPO ── */
+.tempo-wrap{padding:10px 14px;border-top:1px solid var(--border);}
+.tempo-title{font-size:10px;color:var(--hint);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.tempo{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.tp{background:var(--bg);border-radius:9px;padding:8px 4px;text-align:center;}
+.tn{display:block;font-size:24px;font-weight:800;color:var(--g3);line-height:1;}
+.tl{display:block;font-size:9px;color:var(--sec);margin-top:4px;line-height:1.3;}
+
+/* ── WHY — CSS ACCORDION ── */
+.why-wrap{border-top:1px solid var(--border);}
+.why-toggle{display:none;}
+.why-label{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;font-size:13px;color:var(--sec);cursor:pointer;user-select:none;}
+.why-label span.arrow{font-size:11px;transition:transform .2s;display:inline-block;}
+.why-toggle:checked + .why-label span.arrow{transform:rotate(180deg);}
+.why-content{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.why-toggle:checked ~ .why-content{max-height:200px;}
+.why-text{padding:0 14px 14px;font-size:13px;color:var(--sec);line-height:1.7;}
+
+/* ── SECTION LABEL ── */
+.section-lbl{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.07em;margin:20px 0 10px;}
+
+/* ── CARDIO CARD ── */
+.cardio{background:linear-gradient(135deg,var(--g2),var(--g1));border-radius:var(--radius);padding:16px;margin-bottom:14px;}
+.cardio-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;}
+.cardio-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.c-stat{background:rgba(255,255,255,.15);border-radius:9px;padding:9px 8px;text-align:center;}
+.c-sl{font-size:10px;color:rgba(255,255,255,.7);margin-bottom:3px;}
+.c-sv{font-size:13px;font-weight:700;color:#fff;}
+.cardio-why{font-size:12px;color:rgba(255,255,255,.8);line-height:1.6;}
+
+/* ── RULES PAGE ── */
+.tempo-legend{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;padding:16px;}
+.tempo-legend h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;}
+.leg-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;}
+.leg-num{font-size:26px;font-weight:800;color:var(--g3);width:28px;flex-shrink:0;line-height:1;}
+.leg-txt{font-size:13px;color:var(--sec);line-height:1.5;padding-top:4px;}
+.leg-txt strong{color:var(--text);}
+.rule-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;}
+.rule-tag{font-size:11px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.rule-head{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.rule-body{font-size:13px;color:var(--sec);line-height:1.7;}
+
+/* ── DAY COLOR ACCENTS ── */
+.p-lun .day-header h2{color:#993C1D;}
+.p-mar .day-header h2{color:#185FA5;}
+.p-mer .day-header h2{color:#0F6E56;}
+.p-jeu .day-header h2{color:#993C1D;}
+.p-ven .day-header h2{color:#534AB7;}
+</style>
+</head>
+<body>
+
+<!-- RADIO INPUTS (must be siblings of everything) -->
+<input type="radio" name="tab" id="t-lun" checked>
+<input type="radio" name="tab" id="t-mar">
+<input type="radio" name="tab" id="t-mer">
+<input type="radio" name="tab" id="t-jeu">
+<input type="radio" name="tab" id="t-ven">
+<input type="radio" name="tab" id="t-reg">
+
+<!-- STICKY HEADER + TAB BAR -->
+<div class="app-bar">
+  <div class="app-bar-inner">
+    <h1>Plan Biomécanique</h1>
+    <p>75 min max · Déficit calorique · TUT optimisé</p>
+  </div>
+  <div class="tab-bar">
+    <label class="tab-label" for="t-lun">Lundi</label>
+    <label class="tab-label" for="t-mar">Mardi</label>
+    <label class="tab-label" for="t-mer">Mercredi</label>
+    <label class="tab-label" for="t-jeu">Jeudi</label>
+    <label class="tab-label" for="t-ven">Vendredi</label>
+    <label class="tab-label" for="t-reg">Règles</label>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div class="pages">
+
+<!-- ═══════════ LUNDI ═══════════ -->
+<div class="page p-lun">
+  <div class="day-header">
+    <h2>PUSH</h2>
+    <p>Pectoraux &amp; Force</p>
+  </div>
+  <div class="banner">Signal de maintien de force. Phase excentrique lente pour protéger les épaules et optimiser le TUT.</div>
+
+  <div class="section-lbl">Exercices</div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Développé couché (barre ou haltères)</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">6–8</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pousse</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-l1">
+      <label class="why-label" for="w-l1"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Mouvement polyarticulaire lourd pour envoyer le signal principal de maintien de la force. Descente sur 3 sec pour ne pas rebondir sur le sternum — <strong>protection des épaules</strong>.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Développé militaire assis (haltères)</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pousse</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-l2">
+      <label class="why-label" for="w-l2"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Les haltères permettent un <strong>arc de cercle naturel</strong> qui réduit la friction dans l'articulation de l'épaule, contrairement à une barre fixe.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Dips (buste penché) ou machine décliné</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pousse</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-l3">
+      <label class="why-label" for="w-l3"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Buste penché pour cibler le <strong>faisceau inférieur des pectoraux</strong>. Tempo lent en descente pour éviter la déchirure à l'insertion du grand pectoral.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Super-Set : Écartés poulie + Extension triceps poulie haute</div>
+      <span class="badge b-super">Super-Set</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">12–15</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">2</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pousse</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Contraction</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-l4">
+      <label class="why-label" for="w-l4"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Gorge le muscle de sang (<strong>pump</strong>) et apporte les nutriments en gagnant du temps précieux sur le chrono de 75 min.</p></div>
+    </div>
+  </div>
+
+  <div class="section-lbl">Cardio finisseur</div>
+  <div class="cardio">
+    <div class="cardio-title">Marche tapis incliné</div>
+    <div class="cardio-grid">
+      <div class="c-stat"><div class="c-sl">Durée</div><div class="c-sv">15–20 min</div></div>
+      <div class="c-stat"><div class="c-sl">Inclinaison</div><div class="c-sv">12–15%</div></div>
+      <div class="c-stat"><div class="c-sl">Vitesse</div><div class="c-sv">4,5–5,5 km/h</div></div>
+      <div class="c-stat"><div class="c-sl">Impact</div><div class="c-sv">Zéro</div></div>
+    </div>
+    <div class="cardio-why">Après 1h de muscu, le sang est vide de sucre. La marche inclinée force le corps à puiser dans les cellules adipeuses sans générer de fatigue nerveuse pour le lendemain.</div>
+  </div>
+</div>
+
+<!-- ═══════════ MARDI ═══════════ -->
+<div class="page p-mar">
+  <div class="day-header">
+    <h2>PULL</h2>
+    <p>Dos &amp; Biceps</p>
+  </div>
+  <div class="banner">Bâtisseur de l'épaisseur dorsale. Attention au gainage lombaire sur chaque mouvement lourd.</div>
+
+  <div class="section-lbl">Exercices</div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Tirage vertical poitrine (prise large)</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Montée</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Tire</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Contraction</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-m1">
+      <label class="why-label" for="w-m1"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">La <strong>pause 1 sec en contraction maximale</strong> force le recrutement des fibres du grand dorsal et empêche le coup de reins.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Rowing barre (buste à 45°)</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Tire</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-m2">
+      <label class="why-label" for="w-m2"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Bâtisseur principal de l'épaisseur du dos. <strong>45° et non parallèle au sol</strong> pour limiter le bras de levier et protéger les disques lombaires à 104 kg.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Tirage horizontal (prise serrée neutre)</div>
+      <span class="badge b-iso">Isolation</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Montée</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Tire</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-m3">
+      <label class="why-label" for="w-m3"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Cible le <strong>centre du dos</strong> (trapèzes moyens &amp; rhomboïdes). Améliore la posture globale.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Super-Set : Facepull poulie + Curl biceps (EZ ou haltères)</div>
+      <span class="badge b-super">Super-Set</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">12–15</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">2</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Tire</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Contraction</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-m4">
+      <label class="why-label" for="w-m4"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Le <strong>Facepull est le mouvement roi</strong> pour la santé de la coiffe des rotateurs. Indispensable pour la longévité articulaire.</p></div>
+    </div>
+  </div>
+
+  <div class="section-lbl">Cardio finisseur</div>
+  <div class="cardio">
+    <div class="cardio-title">Marche tapis incliné</div>
+    <div class="cardio-grid">
+      <div class="c-stat"><div class="c-sl">Durée</div><div class="c-sv">15–20 min</div></div>
+      <div class="c-stat"><div class="c-sl">Inclinaison</div><div class="c-sv">12–15%</div></div>
+      <div class="c-stat"><div class="c-sl">Vitesse</div><div class="c-sv">4,5–5,5 km/h</div></div>
+      <div class="c-stat"><div class="c-sl">Impact</div><div class="c-sv">Zéro</div></div>
+    </div>
+    <div class="cardio-why">Après 1h de muscu, le sang est vide de sucre. La marche inclinée force le corps à puiser dans les cellules adipeuses sans générer de fatigue nerveuse pour le lendemain.</div>
+  </div>
+</div>
+
+<!-- ═══════════ MERCREDI ═══════════ -->
+<div class="page p-mer">
+  <div class="day-header">
+    <h2>LEGS &amp; ABDOS</h2>
+    <p>Moteur Métabolique</p>
+  </div>
+  <div class="banner">Le SNC est affaibli en déficit calorique. On préfère la presse au squat pour sécuriser la colonne vertébrale.</div>
+
+  <div class="section-lbl">Exercices</div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Presse à cuisses (pieds au milieu du plateau)</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min 30</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">4</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pousse</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-me1">
+      <label class="why-label" for="w-me1"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text"><strong>4 sec de descente = brûlure métabolique énorme.</strong> La presse matraque les quadriceps en sécurité quand le SNC est affaibli en déficit calorique.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Soulevé de terre roumain (haltères ou barre)</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Tire</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-me2">
+      <label class="why-label" for="w-me2"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Focus <strong>chaîne postérieure</strong> (IJ &amp; fessiers). Descendre jusqu'à mi-tibia uniquement pour ne pas arrondir le bas du dos.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Super-Set : Leg extension + Leg curl</div>
+      <span class="badge b-super">Super-Set</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">2</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pousse</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Contraction</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-me3">
+      <label class="why-label" for="w-me3"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Isolation pure pour épuiser les réserves de glycogène des cuisses <strong>sans taxer le SNC</strong>.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Circuit abdos — Relevés de genoux suspendus + Crunch poulie haute</div>
+      <span class="badge b-circ">Circuit × 3</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Tours</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">15 chaque</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min/tour</div></div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-me4">
+      <label class="why-label" for="w-me4"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Gainage fonctionnel <strong>sans charge spinale</strong>. Les relevés de genoux suspendus travaillent le psoas et le droit abdominal.</p></div>
+    </div>
+  </div>
+
+  <div class="section-lbl">Cardio finisseur</div>
+  <div class="cardio">
+    <div class="cardio-title">Marche tapis incliné</div>
+    <div class="cardio-grid">
+      <div class="c-stat"><div class="c-sl">Durée</div><div class="c-sv">15–20 min</div></div>
+      <div class="c-stat"><div class="c-sl">Inclinaison</div><div class="c-sv">12–15%</div></div>
+      <div class="c-stat"><div class="c-sl">Vitesse</div><div class="c-sv">4,5–5,5 km/h</div></div>
+      <div class="c-stat"><div class="c-sl">Impact</div><div class="c-sv">Zéro</div></div>
+    </div>
+    <div class="cardio-why">Après 1h de muscu, le sang est vide de sucre. La marche inclinée force le corps à puiser dans les cellules adipeuses sans générer de fatigue nerveuse pour le lendemain.</div>
+  </div>
+</div>
+
+<!-- ═══════════ JEUDI ═══════════ -->
+<div class="page p-jeu">
+  <div class="day-header">
+    <h2>UPPER A</h2>
+    <p>Épaules &amp; Haut de Pecs</p>
+  </div>
+  <div class="banner">Les épaules réagissent très bien aux séries longues et au stress métabolique. Volume ciblé.</div>
+
+  <div class="section-lbl">Exercices</div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Développé incliné haltères (banc à 30°)</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pousse</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-j1">
+      <label class="why-label" for="w-j1"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text"><strong>30° (pas 45°)</strong> cible le haut des pectoraux en désactivant au maximum le deltoïde antérieur.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Tirage menton (poulie + corde) ou Shrugs</div>
+      <span class="badge b-iso">Isolation</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">2</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Tire</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Contraction</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-j2">
+      <label class="why-label" for="w-j2"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">La corde permet d'<strong>écarter les mains en fin de mouvement</strong>, libérant l'espace sous-acromial — évite le conflit douloureux dans l'épaule.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Rowing haltère 1 bras (appui sur banc)</div>
+      <span class="badge b-iso">Isolation</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">10/bras</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Tire</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-j3">
+      <label class="why-label" for="w-j3"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">L'appui sur le banc <strong>décharge totalement la colonne vertébrale</strong>. Le mouvement le plus sûr pour tirer lourd.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Super-Set : Élévations latérales haltères + Oiseau (buste penché)</div>
+      <span class="badge b-super">Super-Set</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">2</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Lève</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-j4">
+      <label class="why-label" for="w-j4"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Les épaules réagissent très bien aux séries longues. Ce super-set donne l'<strong>aspect 3D et large</strong> à la carrure.</p></div>
+    </div>
+  </div>
+
+  <div class="section-lbl">Cardio finisseur</div>
+  <div class="cardio">
+    <div class="cardio-title">Marche tapis incliné</div>
+    <div class="cardio-grid">
+      <div class="c-stat"><div class="c-sl">Durée</div><div class="c-sv">15–20 min</div></div>
+      <div class="c-stat"><div class="c-sl">Inclinaison</div><div class="c-sv">12–15%</div></div>
+      <div class="c-stat"><div class="c-sl">Vitesse</div><div class="c-sv">4,5–5,5 km/h</div></div>
+      <div class="c-stat"><div class="c-sl">Impact</div><div class="c-sv">Zéro</div></div>
+    </div>
+    <div class="cardio-why">Après 1h de muscu, le sang est vide de sucre. La marche inclinée force le corps à puiser dans les cellules adipeuses sans générer de fatigue nerveuse pour le lendemain.</div>
+  </div>
+</div>
+
+<!-- ═══════════ VENDREDI ═══════════ -->
+<div class="page p-ven">
+  <div class="day-header">
+    <h2>UPPER B</h2>
+    <p>Volume Global &amp; Congestion</p>
+  </div>
+  <div class="banner">En fin de semaine, la fatigue nerveuse est haute. On privilégie les machines et les poulies.</div>
+
+  <div class="section-lbl">Exercices</div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Développé couché machine convergente assis</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pousse</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-v1">
+      <label class="why-label" for="w-v1"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">La machine permet de <strong>pousser fort sans gérer la stabilisation</strong> d'une barre libre quand le SNC est fatigué en fin de semaine.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Tirage vertical prise neutre (V-bar ou poignées serrées)</div>
+      <span class="badge b-poly">Polyarticulaire</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Montée</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Tire</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-v2">
+      <label class="why-label" for="w-v2"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">La prise neutre aligne parfaitement les fibres du grand dorsal et offre la <strong>plus grande amplitude d'étirement</strong>.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Pull-over poulie haute (corde, bras quasi tendus)</div>
+      <span class="badge b-iso">Isolation</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">3</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Tire</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-v3">
+      <label class="why-label" for="w-v3"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">Le <strong>seul exercice qui isole le grand dorsal sans les biceps</strong>. Idéal pour terminer le dos en fin de semaine.</p></div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
+      <div class="ex-name">Élévations latérales poulie basse (un bras à la fois)</div>
+      <span class="badge b-iso">Isolation</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">2</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Lève</span></div>
+        <div class="tp"><span class="tn">0</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+    <div class="why-wrap">
+      <input type="checkbox" class="why-toggle" id="w-v4">
+      <label class="why-label" for="w-v4"><span>Pourquoi cet exercice ?</span><span class="arrow">▾</span></label>
+      <div class="why-content"><p class="why-text">La poulie offre une <strong>tension continue</strong> tout au long du mouvement, contrairement aux haltères où la tension est nulle en bas.</p></div>
+    </div>
+  </div>
+
+  <div class="section-lbl">Cardio finisseur</div>
+  <div class="cardio">
+    <div class="cardio-title">Marche tapis incliné</div>
+    <div class="cardio-grid">
+      <div class="c-stat"><div class="c-sl">Durée</div><div class="c-sv">15–20 min</div></div>
+      <div class="c-stat"><div class="c-sl">Inclinaison</div><div class="c-sv">12–15%</div></div>
+      <div class="c-stat"><div class="c-sl">Vitesse</div><div class="c-sv">4,5–5,5 km/h</div></div>
+      <div class="c-stat"><div class="c-sl">Impact</div><div class="c-sv">Zéro</div></div>
+    </div>
+    <div class="cardio-why">Après 1h de muscu, le sang est vide de sucre. La marche inclinée force le corps à puiser dans les cellules adipeuses sans générer de fatigue nerveuse pour le lendemain.</div>
+  </div>
+</div>
+
+<!-- ═══════════ RÈGLES ═══════════ -->
+<div class="page p-reg">
+  <div class="day-header">
+    <h2>Règles d'or</h2>
+    <p>Le "Pourquoi" biomécanique</p>
+  </div>
+
+  <div class="section-lbl">Lire le tempo</div>
+  <div class="tempo-legend">
+    <h3>Exemple : 3 · 0 · 1 · 0</h3>
+    <div class="leg-row"><span class="leg-num">3</span><span class="leg-txt"><strong>Excentrique</strong> — secondes de descente. C'est là que se créent les micro-déchirures musculaires qui stimulent l'hypertrophie.</span></div>
+    <div class="leg-row"><span class="leg-num">0</span><span class="leg-txt"><strong>Pause en bas</strong> — 0 = pas de pause. 1 = maintenir 1 seconde en bas du mouvement.</span></div>
+    <div class="leg-row"><span class="leg-num">1</span><span class="leg-txt"><strong>Concentrique</strong> — secondes de poussée ou traction. Souvent rapide (1 sec) ou explosif.</span></div>
+    <div class="leg-row"><span class="leg-num">0</span><span class="leg-txt"><strong>Pause en haut</strong> — 1 = contraction maximale maintenue 1 seconde en position haute.</span></div>
+  </div>
+
+  <div class="section-lbl">Les règles</div>
+
+  <div class="rule-card">
+    <div class="rule-tag">Durée strictement limitée</div>
+    <div class="rule-head">75 minutes maximum</div>
+    <div class="rule-body">En déficit calorique, le système nerveux central fatigue plus vite. Dépasser ce délai provoque un pic de cortisol qui détruit le muscle pour créer de l'énergie. Stimulus court, dense et violent — puis on sort de la salle.</div>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-tag">Temps sous tension maximal</div>
+    <div class="rule-head">Phase excentrique 3–4 secondes</div>
+    <div class="rule-body">La phase de retenue crée le plus de micro-déchirures musculaires, stimulant l'hypertrophie. Freiner une charge lourde augmente drastiquement le coût métabolique : on brûle plus de calories à retenir la barre qu'à la pousser.</div>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-tag">Récupération calibrée</div>
+    <div class="rule-head">Repos 2 min / 1 min 30</div>
+    <div class="rule-body">2 minutes sur les gros mouvements pour recharger l'ATP (énergie pure du muscle) et conserver la force. 1 minute 30 sur l'isolation pour créer un stress métabolique signalant au corps de conserver cette zone musculaire.</div>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-tag">Brûle-graisses post-séance</div>
+    <div class="rule-head">Cardio NEAT — zéro impact</div>
+    <div class="rule-body">Tapis incliné 12–15% · 4,5–5,5 km/h · 15–20 minutes. Après 1h de musculation, le sang est vide de sucre. Cette marche oblige le corps à ouvrir les cellules adipeuses pour fournir l'énergie, sans impact articulaire ni fatigue nerveuse supplémentaire.</div>
+  </div>
+</div>
+
+</div><!-- /pages -->
+</body>
+</html>
