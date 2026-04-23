@@ -42,16 +42,31 @@ input[type=radio]{display:none;}
 #t-mer:checked ~ .app-bar .tab-bar label[for=t-mer],
 #t-jeu:checked ~ .app-bar .tab-bar label[for=t-jeu],
 #t-ven:checked ~ .app-bar .tab-bar label[for=t-ven],
+#t-samdim:checked ~ .app-bar .tab-bar label[for=t-samdim],
 #t-reg:checked ~ .app-bar .tab-bar label[for=t-reg]{color:#fff;border-bottom:3px solid #fff;}
+
+/* ── MODE SELECTOR ── */
+.mode-bar{background:var(--card);padding:10px 16px;display:flex;gap:8px;border-bottom:1px solid var(--border);}
+.mode-btn{flex:1;text-align:center;padding:8px;font-size:12px;font-weight:700;border-radius:8px;background:var(--bg);color:var(--sec);cursor:pointer;transition:all .2s;}
+#m-seche:checked ~ .mode-bar label[for=m-seche],
+#m-pdm:checked ~ .mode-bar label[for=m-pdm]{background:var(--g3);color:#fff;}
 
 /* ── PAGES ── */
 .page{display:none;padding:16px 16px 80px;}
-#t-lun:checked ~ .pages .p-lun,
-#t-mar:checked ~ .pages .p-mar,
-#t-mer:checked ~ .pages .p-mer,
-#t-jeu:checked ~ .pages .p-jeu,
-#t-ven:checked ~ .pages .p-ven,
-#t-reg:checked ~ .pages .p-reg{display:block;}
+
+#m-seche:checked ~ #t-lun:checked ~ .pages .p-seche.p-lun,
+#m-seche:checked ~ #t-mar:checked ~ .pages .p-seche.p-mar,
+#m-seche:checked ~ #t-mer:checked ~ .pages .p-seche.p-mer,
+#m-seche:checked ~ #t-jeu:checked ~ .pages .p-seche.p-jeu,
+#m-seche:checked ~ #t-ven:checked ~ .pages .p-seche.p-ven,
+#m-seche:checked ~ #t-reg:checked ~ .pages .p-reg,
+#m-pdm:checked ~ #t-lun:checked ~ .pages .p-pdm.p-lun,
+#m-pdm:checked ~ #t-mar:checked ~ .pages .p-pdm.p-mar,
+#m-pdm:checked ~ #t-mer:checked ~ .pages .p-pdm.p-mer,
+#m-pdm:checked ~ #t-jeu:checked ~ .pages .p-pdm.p-jeu,
+#m-pdm:checked ~ #t-ven:checked ~ .pages .p-pdm.p-ven,
+#m-pdm:checked ~ #t-samdim:checked ~ .pages .p-pdm.p-samdim,
+#m-pdm:checked ~ #t-reg:checked ~ .pages .p-reg { display: block; }
 
 /* ── DAY HEADER ── */
 .day-header{margin-bottom:16px;}
@@ -70,8 +85,12 @@ input[type=radio]{display:none;}
 .b-circ{background:var(--pl);color:var(--p1);}
 
 /* ── STATS GRID ── */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 14px;border-top:1px solid var(--border);}
-.stat{background:var(--bg);border-radius:9px;padding:9px 6px;text-align:center;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 14px;border-top:1px solid var(--border);}
+.stat{background:var(--bg);border-radius:9px;padding:6px 4px;text-align:center;display:flex;flex-direction:column;justify-content:center;}
+.weight-input{width:100%;border:1px solid var(--border);background:#fff;border-radius:6px;padding:4px;font-size:12px;font-weight:700;text-align:center;color:var(--g1);outline:none;margin-top:2px;}
+.timer-btn{background:var(--g3);color:#fff;border:none;border-radius:6px;padding:5px;font-size:10px;font-weight:800;cursor:pointer;margin-top:4px;text-transform:uppercase;-webkit-appearance:none;}
+.timer-display{font-size:12px;font-weight:800;color:var(--r1);margin-top:2px;display:none;}
+.series-count{font-size:10px;font-weight:700;color:var(--g3);margin-top:2px;}
 .sl{font-size:10px;color:var(--hint);margin-bottom:3px;font-weight:500;}
 .sv{font-size:13px;font-weight:700;color:var(--text);}
 
@@ -128,25 +147,34 @@ input[type=radio]{display:none;}
 <body>
 
 <!-- RADIO INPUTS (must be siblings of everything) -->
+<input type="radio" name="mode" id="m-seche" checked>
+<input type="radio" name="mode" id="m-pdm">
+
 <input type="radio" name="tab" id="t-lun" checked>
 <input type="radio" name="tab" id="t-mar">
 <input type="radio" name="tab" id="t-mer">
 <input type="radio" name="tab" id="t-jeu">
 <input type="radio" name="tab" id="t-ven">
+<input type="radio" name="tab" id="t-samdim">
 <input type="radio" name="tab" id="t-reg">
 
 <!-- STICKY HEADER + TAB BAR -->
 <div class="app-bar">
   <div class="app-bar-inner">
     <h1>Plan Biomécanique</h1>
-    <p>75 min max · Déficit calorique · TUT optimisé</p>
+    <p>TUT optimisé · Performance</p>
+  </div>
+  <div class="mode-bar">
+    <label class="mode-btn" for="m-seche">SÈCHE</label>
+    <label class="mode-btn" for="m-pdm">MAINTIEN / PDM</label>
   </div>
   <div class="tab-bar">
-    <label class="tab-label" for="t-lun">Lundi</label>
-    <label class="tab-label" for="t-mar">Mardi</label>
-    <label class="tab-label" for="t-mer">Mercredi</label>
-    <label class="tab-label" for="t-jeu">Jeudi</label>
-    <label class="tab-label" for="t-ven">Vendredi</label>
+    <label class="tab-label" for="t-lun">Lun</label>
+    <label class="tab-label" for="t-mar">Mar</label>
+    <label class="tab-label" for="t-mer">Mer</label>
+    <label class="tab-label" for="t-jeu">Jeu</label>
+    <label class="tab-label" for="t-ven">Ven</label>
+    <label class="tab-label" for="t-samdim">S/D</label>
     <label class="tab-label" for="t-reg">Règles</label>
   </div>
 </div>
@@ -155,7 +183,7 @@ input[type=radio]{display:none;}
 <div class="pages">
 
 <!-- ═══════════ LUNDI ═══════════ -->
-<div class="page p-lun">
+<div class="page p-seche p-lun">
   <div class="day-header">
     <h2>PUSH</h2>
     <p>Pectoraux &amp; Force</p>
@@ -171,8 +199,9 @@ input[type=radio]{display:none;}
     </div>
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
-      <div class="stat"><div class="sl">Répétitions</div><div class="sv">6–8</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+      <div class="stat"><div class="sl">Reps</div><div class="sv">6–8</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2m</div><button class="timer-btn" data-time="120" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-lu-dc" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -197,8 +226,9 @@ input[type=radio]{display:none;}
     </div>
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
-      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+      <div class="stat"><div class="sl">Reps</div><div class="sv">8–10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2m</div><button class="timer-btn" data-time="120" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-lu-dm" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -224,7 +254,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-lu-dips" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -250,7 +281,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">12–15</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m</div><button class="timer-btn" data-time="60" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-lu-ss" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -282,7 +314,7 @@ input[type=radio]{display:none;}
 </div>
 
 <!-- ═══════════ MARDI ═══════════ -->
-<div class="page p-mar">
+<div class="page p-seche p-mar">
   <div class="day-header">
     <h2>PULL</h2>
     <p>Dos &amp; Biceps</p>
@@ -299,7 +331,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2m</div><button class="timer-btn" data-time="120" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-ma-tv" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -325,7 +358,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2m</div><button class="timer-btn" data-time="120" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-ma-rb" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -351,7 +385,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-ma-th" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -377,7 +412,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">12–15</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m</div><button class="timer-btn" data-time="60" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-ma-ss" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -409,7 +445,7 @@ input[type=radio]{display:none;}
 </div>
 
 <!-- ═══════════ MERCREDI ═══════════ -->
-<div class="page p-mer">
+<div class="page p-seche p-mer">
   <div class="day-header">
     <h2>LEGS &amp; ABDOS</h2>
     <p>Moteur Métabolique</p>
@@ -426,7 +462,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min 30</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2m30</div><button class="timer-btn" data-time="150" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-me-pr" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -452,7 +489,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">10</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2m</div><button class="timer-btn" data-time="120" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-me-rdl" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -472,13 +510,36 @@ input[type=radio]{display:none;}
 
   <div class="ex">
     <div class="ex-head">
+      <div class="ex-name">Mollets à la presse ou debout</div>
+      <span class="badge b-iso">Isolation</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">15–20</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m</div><button class="timer-btn" data-time="60" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-me-mo" placeholder="kg"></div>
+    </div>
+    <div class="tempo-wrap">
+      <div class="tempo-title">Tempo</div>
+      <div class="tempo">
+        <div class="tp"><span class="tn">2</span><span class="tl">Descente</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pause bas</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Montée</span></div>
+        <div class="tp"><span class="tn">1</span><span class="tl">Pause haut</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="ex-head">
       <div class="ex-name">Super-Set : Leg extension + Leg curl</div>
       <span class="badge b-super">Super-Set</span>
     </div>
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-me-ss" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -504,7 +565,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Tours</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">15 chaque</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min/tour</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m</div><button class="timer-btn" data-time="60" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Tour 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-me-ab" placeholder="kg"></div>
     </div>
     <div class="why-wrap">
       <input type="checkbox" class="why-toggle" id="w-me4">
@@ -527,7 +589,7 @@ input[type=radio]{display:none;}
 </div>
 
 <!-- ═══════════ JEUDI ═══════════ -->
-<div class="page p-jeu">
+<div class="page p-seche p-jeu">
   <div class="day-header">
     <h2>UPPER A</h2>
     <p>Épaules &amp; Haut de Pecs</p>
@@ -544,7 +606,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">2 min</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2m</div><button class="timer-btn" data-time="120" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-je-di" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -570,7 +633,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-je-tm" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -596,7 +660,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">10/bras</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-je-r1b" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -622,7 +687,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m</div><button class="timer-btn" data-time="60" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-je-ss" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -654,7 +720,7 @@ input[type=radio]{display:none;}
 </div>
 
 <!-- ═══════════ VENDREDI ═══════════ -->
-<div class="page p-ven">
+<div class="page p-seche p-ven">
   <div class="day-header">
     <h2>UPPER B</h2>
     <p>Volume Global &amp; Congestion</p>
@@ -671,7 +737,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-ve-dcm" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -697,7 +764,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min 30</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-ve-tvn" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -723,7 +791,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m</div><button class="timer-btn" data-time="60" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-ve-po" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -749,7 +818,8 @@ input[type=radio]{display:none;}
     <div class="stats">
       <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
       <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
-      <div class="stat"><div class="sl">Repos</div><div class="sv">1 min</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m</div><button class="timer-btn" data-time="60" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="s-ve-el" placeholder="kg"></div>
     </div>
     <div class="tempo-wrap">
       <div class="tempo-title">Tempo</div>
@@ -778,6 +848,216 @@ input[type=radio]{display:none;}
     </div>
     <div class="cardio-why">Après 1h de muscu, le sang est vide de sucre. La marche inclinée force le corps à puiser dans les cellules adipeuses sans générer de fatigue nerveuse pour le lendemain.</div>
   </div>
+</div>
+
+<!-- ═══════════ PDM PAGES ═══════════ -->
+
+<!-- LUNDI PDM -->
+<div class="page p-pdm p-lun">
+  <div class="day-header">
+    <h2>PUSH</h2>
+    <p>Pectoraux / Épaules / Triceps · 50 min</p>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Développé Couché (Barre)</div><span class="badge b-poly">Force</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Reps</div><div class="sv">6–8</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">2-3m</div><button class="timer-btn" data-time="150" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="p-lu-dc" placeholder="kg"></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Développé Incliné (Haltères)</div><span class="badge b-poly">Poly</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Reps</div><div class="sv">8–10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="p-lu-di" placeholder="kg"></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Développé Militaire Barre</div><span class="badge b-poly">Épaules</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Reps</div><div class="sv">8–10</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="p-lu-dm" placeholder="kg"></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Élévations Latérales</div><span class="badge b-iso">Isolation</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Reps</div><div class="sv">12–15</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m</div><button class="timer-btn" data-time="60" data-sets="4">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/4</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="p-lu-el" placeholder="kg"></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Dips</div><span class="badge b-poly">Triceps</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Reps</div><div class="sv">Échec</div></div>
+      <div class="stat"><div class="sl">Repos</div><div class="sv">1m30</div><button class="timer-btn" data-time="90" data-sets="3">Start</button><div class="timer-display">0:00</div><div class="series-count">Série 0/3</div></div>
+      <div class="stat"><div class="sl">Poids</div><input type="text" class="weight-input" data-id="p-lu-dips" placeholder="kg"></div>
+    </div>
+  </div>
+  <div class="section-lbl">Finisseur &amp; Abdos</div>
+  <div class="banner">Circuit : Relevé Jambes (20) + Oblique sol (10/c) + Russian Twist (20 à 24kg). 3-4 tours. 1 min repos fin. Étirement dos + superman.</div>
+</div>
+
+<!-- MARDI PDM -->
+<div class="page p-pdm p-mar">
+  <div class="day-header">
+    <h2>PULL</h2>
+    <p>Dos / Arrière d'épaule / Biceps · 1h05</p>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Tractions</div><span class="badge b-poly">Poids du corps</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Rowing Barre</div><span class="badge b-poly">Épaisseur</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8–10</div></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Tirage Horizontal</div><span class="badge b-poly">Dos</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Oiseau (ou Facepull)</div><span class="badge b-iso">Arrière épaule</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">8</div></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Shrugs</div><span class="badge b-iso">Trapèzes</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">12</div></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Curl Biceps</div><span class="badge b-iso">Bras</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">6–8</div></div>
+    </div>
+  </div>
+  <div class="banner">Étirement dos + superman.</div>
+</div>
+
+<!-- MERCREDI PDM -->
+<div class="page p-pdm p-mer">
+  <div class="day-header">
+    <h2>REPOS</h2>
+    <p>Récupération active</p>
+  </div>
+  <div class="banner">Smoothie protéiné recommandé. Profite pour bien t'étirer et marcher.</div>
+</div>
+
+<!-- JEUDI PDM -->
+<div class="page p-pdm p-jeu">
+  <div class="day-header">
+    <h2>LEGS</h2>
+    <p>Jambes Complètes</p>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">RDL (Soulevé de terre roumain)</div><span class="badge b-poly">Chaîne Post.</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">6–8</div></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Presse à cuisses</div><span class="badge b-poly">Quadriceps</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">10–12</div></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Fentes Bulgares</div><span class="badge b-poly">Fessiers/Quads</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">4</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">10</div></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Adducteurs / Abducteurs</div><span class="badge b-iso">Isolation</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
+    </div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Leg Ext / Leg Curl</div><span class="badge b-super">Super-Set</span></div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Séries</div><div class="sv">3</div></div>
+      <div class="stat"><div class="sl">Répétitions</div><div class="sv">15</div></div>
+    </div>
+  </div>
+  <div class="banner">Étirement dos + superman.</div>
+</div>
+
+<!-- VENDREDI PDM -->
+<div class="page p-pdm p-ven">
+  <div class="day-header">
+    <h2>UPPER</h2>
+    <p>Volume Haut du Corps</p>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Développé Couché Haltères</div><span class="badge b-poly">3 x 10-12</span></div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Tirage Horizontal</div><span class="badge b-poly">3 x 10-12</span></div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Écartés Poulie (Pecs)</div><span class="badge b-iso">3 x 15-20</span></div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Élévations Latérales (Poulie)</div><span class="badge b-iso">4 x 15-20</span></div>
+  </div>
+
+  <div class="section-lbl">Variante (Plus lourd)</div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">DC Haltères</div><span class="badge b-poly">4 x 7 (Lourd)</span></div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Développé Décliné Haltère</div><span class="badge b-poly">3 x 8 (Max amplitude)</span></div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Écartés Poulie Haute</div><span class="badge b-iso">3 x 10</span></div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Élévations Latérales Poulie</div><span class="badge b-iso">3 x 8</span></div>
+  </div>
+  <div class="ex">
+    <div class="ex-head"><div class="ex-name">Curl Marteau</div><span class="badge b-iso">3 x 6 (Lourd)</span></div>
+  </div>
+
+  <div class="section-lbl">Abdos PDM</div>
+  <div class="banner">Circuit : Relevé Jambes (20) + Oblique sol (10/c) + Russian Twist (20 à 24kg). 3-4 tours. 1 min repos fin. Étirement dos + superman.</div>
+</div>
+
+<!-- SAMEDI/DIMANCHE PDM -->
+<div class="page p-pdm p-samdim">
+  <div class="day-header">
+    <h2>WEEKEND</h2>
+    <p>Repos &amp; Nutrition</p>
+  </div>
+  <div class="banner">Repos mérité. Option : Pancakes ou Smoothie.</div>
 </div>
 
 <!-- ═══════════ RÈGLES ═══════════ -->
@@ -824,5 +1104,78 @@ input[type=radio]{display:none;}
 </div>
 
 </div><!-- /pages -->
+
+<script>
+// Sauvegarde des poids
+document.querySelectorAll('.weight-input').forEach(input => {
+  const id = input.getAttribute('data-id');
+  if (!id) return;
+  
+  const saved = localStorage.getItem('w_' + id);
+  if (saved) input.value = saved;
+
+  input.addEventListener('input', (e) => {
+    localStorage.setItem('w_' + id, e.target.value);
+  });
+});
+
+// Chronomètre & Compteur de séries
+let currentInterval = null;
+const setCounters = {};
+
+document.querySelectorAll('.timer-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const maxSets = parseInt(btn.getAttribute('data-sets'));
+    const exCard = btn.closest('.ex');
+    const weightInput = exCard ? exCard.querySelector('.weight-input') : null;
+    const id = weightInput ? weightInput.getAttribute('data-id') : btn.getAttribute('data-id') || 'unnamed-exo';
+    
+    if (!setCounters[id]) setCounters[id] = 0;
+    
+    if (setCounters[id] >= maxSets) {
+      if (!confirm("Séries maximales atteintes pour cet exercice. Recommencer à zéro ?")) return;
+      setCounters[id] = 0;
+    }
+    
+    setCounters[id]++;
+    const counterDisplay = btn.parentElement.querySelector('.series-count');
+    if (counterDisplay) {
+      const label = counterDisplay.textContent.includes('Tour') ? 'Tour' : 'Série';
+      counterDisplay.textContent = `${label} ${setCounters[id]}/${maxSets}`;
+    }
+
+    if (currentInterval) clearInterval(currentInterval);
+    
+    // Reset visual state of all timer displays
+    document.querySelectorAll('.timer-display').forEach(d => d.style.display = 'none');
+    
+    const display = btn.parentElement.querySelector('.timer-display');
+    display.style.display = 'block';
+    display.style.color = 'var(--r1)';
+    
+    let timeLeft = parseInt(btn.getAttribute('data-time'));
+    
+    const update = () => {
+      const m = Math.floor(timeLeft / 60);
+      const s = timeLeft % 60;
+      display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+    };
+    
+    update();
+    
+    currentInterval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft >= 0) {
+        update();
+      } else {
+        clearInterval(currentInterval);
+        display.textContent = "FIN !";
+        display.style.color = 'var(--g3)';
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      }
+    }, 1000);
+  });
+});
+</script>
 </body>
 </html>
